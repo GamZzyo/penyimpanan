@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Persebaran EDC & LVM KC Tangerang Cikupa</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <style>
+    .pulse {
+      animation: pulse-animation 2s infinite;
+    }
+    @keyframes pulse-animation {
+      0% { transform: scale(0.9); opacity: 0.7; }
+      50% { transform: scale(1.1); opacity: 0.3; }
+      100% { transform: scale(0.9); opacity: 0.7; }
+    }
+    /* Style untuk legend */
+    .legend {
+      background: white;
+      padding: 10px;
+      line-height: 20px;
+      color: #333;
+      border-radius: 5px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.3);
+      font-size: 14px;
+    }
+    .legend i {
+      width: 18px;
+      height: 18px;
+      float: left;
+      margin-right: 8px;
+      opacity: 0.9;
+    }
+
+    /* Style untuk tombol kembali */
+    .back-button {
+      position: absolute;
+      bottom: 20px;   /* pindah ke bawah */
+      left: 10px;     /* posisinya kiri */
+      z-index: 1000;
+      background: white;
+      padding: 8px 12px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+      font-size: 14px;
+    }
+    .back-button:hover {
+      background: #f0f0f0;
+    }
+  </style>
+</head>
+<body>
+  <div id="map" style="width: 100%; height: 600px;"></div>
+  <button class="back-button" onclick="goBack()">📍 Kembali ke Titik Tengah</button>
+
+  <script>
+    var map = L.map('map');
+
+    // Tambahkan tile layer
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '© OpenStreetMap'
+    }).addTo(map);
+
+    // ==============================
+    // 🔵 Titik Biru (EDC Mandiri - dari CSV)
+    // ==============================
+    var locations = [
+      {"lat": -6.238006, "lon": 106.523725},
+      {"lat": -6.224675, "lon": 106.528092},
+      {"lat": -6.244714, "lon": 106.523432},
+      {"lat": -6.232438, "lon": 106.520269},
+      {"lat": -6.230587, "lon": 106.522576},
+{"lat": -6.2380061, "lon": 106.5237246},
+{"lat": -6.2246753, "lon": 106.528092},
+{"lat": -6.2447144, "lon": 106.5234317},
+{"lat": -6.2324383, "lon": 106.5202695},
+{"lat": -6.2305867, "lon": 106.5225759},
+{"lat": -6.2473799, "lon": 106.5308656},
+{"lat": -6.240628, "lon": 106.5149849},
+{"lat": -6.2206665, "lon": 106.5375537},
+{"lat": -6.2207337, "lon": 106.5344243},
+{"lat": -6.2253736, "lon": 106.5272198},
+{"lat": -6.23522, "lon": 106.52326},
+{"lat": -6.2292532, "lon": 106.5198009},
+{"lat": -6.2172851, "lon": 106.5183491},
+{"lat": -6.2259125, "lon": 106.5540355},
+{"lat": -6.2202956, "lon": 106.5539723},
+{"lat": -6.2206356, "lon": 106.5544955},
+{"lat": -6.2358497, "lon": 106.5238111},
+{"lat": -6.243544, "lon": 106.5241325},
+{"lat": -6.2260909, "lon": 106.5457939},
+{"lat": -6.2207148, "lon": 106.5542516},
+{"lat": -6.2318525, "lon": 106.5222069},
+{"lat": -6.2293744, "lon": 106.5224213},
+{"lat": -6.2280762, "lon": 106.5192684},
+{"lat": -6.2293108, "lon": 106.518644},
+{"lat": -6.2288176, "lon": 106.5143663},
+{"lat": -6.2167744, "lon": 106.5230967},
+{"lat": -6.2291624, "lon": 106.5198846},
+{"lat": -6.2247515, "lon": 106.5456071},
+{"lat": -6.2453421, "lon": 106.5262983},
+{"lat": -6.2394451, "lon": 106.524349},
+{"lat": -6.2296524, "lon": 106.5185089},
+{"lat": -6.2478701, "lon": 106.5237011},
+{"lat": -6.2383711, "lon": 106.5215433},
+{"lat": -6.2399125, "lon": 106.5423281},
+{"lat": -6.2291838, "lon": 106.5169841},
+{"lat": -6.2194256, "lon": 106.5201084},
+{"lat": -6.2410555, "lon": 106.5149189},
+{"lat": -6.2292242, "lon": 106.5229498},
+{"lat": -6.2254217, "lon": 106.5273673},
+{"lat": -6.2450718, "lon": 106.5298334},
+{"lat": -6.2480007, "lon": 106.5239532},
+{"lat": -6.2470669, "lon": 106.5295443},
+{"lat": -6.2156355, "lon": 106.5173928},
+{"lat": -6.2380917, "lon": 106.5148306},
+{"lat": -6.2360573, "lon": 106.5380214},
+{"lat": -6.2163181, "lon": 106.5289116},
+{"lat": -6.2316125, "lon": 106.5285469},
+{"lat": -6.2277648, "lon": 106.5277136},
+{"lat": -6.244594, "lon": 106.5258071},
+{"lat": -6.2323842, "lon": 106.5440479},
+{"lat": -6.2191069, "lon": 106.5313235},
+{"lat": -6.2450941, "lon": 106.5299877},
+{"lat": -6.2438458, "lon": 106.5175256},
+{"lat": -6.2376227, "lon": 106.5358306},
+{"lat": -6.2407496, "lon": 106.5269891},
+{"lat": -6.2185419, "lon": 106.5178363},
+{"lat": -6.2382402, "lon": 106.5197885},
+{"lat": -6.2230726, "lon": 106.5535772},
+{"lat": -6.2306413, "lon": 106.5489732},
+{"lat": -6.2427039, "lon": 106.5388269},
+{"lat": -6.2473813, "lon": 106.5310752},
+{"lat": -6.2299608, "lon": 106.5229514},
+{"lat": -6.238821, "lon": 106.5244499},
+{"lat": -6.2289037, "lon": 106.543676},
+{"lat": -6.2245718, "lon": 106.5452457},
+{"lat": -6.2441633, "lon": 106.5271168},
+{"lat": -6.2302515, "lon": 106.5211941},
+{"lat": -6.2405179, "lon": 106.5417479},
+{"lat": -6.2432732, "lon": 106.5244318},
+{"lat": -6.2304189, "lon": 106.523324},
+{"lat": -6.2308719, "lon": 106.5222036},
+{"lat": -6.2323624, "lon": 106.5446793},
+{"lat": -6.2362986, "lon": 106.5233922},
+{"lat": -6.2368656, "lon": 106.5227069},
+{"lat": -6.2328217, "lon": 106.5213949},
+{"lat": -6.2259754, "lon": 106.5541777},
+{"lat": -6.2343978, "lon": 106.5318919},
+{"lat": -6.2191054, "lon": 106.5566011}
+      // 👉 lanjutkan semua baris dari CSV
+    ];
+    var bounds = [];
+    locations.forEach(function(loc) {
+      var marker = L.marker([loc.lat, loc.lon])
+        .addTo(map)
+        .bindPopup("<b>EDC Mandiri</b><br>Lat: " + loc.lat + "<br>Lon: " + loc.lon);
+      bounds.push([loc.lat, loc.lon]);
+    });
+
+    if (bounds.length > 0) {
+      map.fitBounds(bounds);
+    } else {
+      map.setView([-6.2, 106.8], 12);
+    }
+
+    // ==============================
+    // 🔴 Titik Merah (KC Tangerang Cikupa)
+    // ==============================
+    var specialLat = -6.228489399587383;
+    var specialLon = 106.52422519899497;
+    var redIcon = new L.Icon({
+      iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
+      shadowUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
+      iconSize: [25, 41], iconAnchor: [12, 41],
+      popupAnchor: [1, -34], shadowSize: [41, 41]
+    });
+    var redMarker = L.marker([specialLat, specialLon], {icon: redIcon})
+      .addTo(map)
+      .bindPopup("<b>KC Tangerang Cikupa</b><br>Radius 5KM");
+    L.circle([specialLat, specialLon], {
+      color: 'red', fillColor: '#f03', fillOpacity: 0.2, radius: 5000
+    }).addTo(map);
+L.circleMarker([specialLat, specialLon], {
+      radius: 20, color: 'red', className: '',
+      fillColor: 'red', fillOpacity: 0.4
+    }).addTo(map);
+    // ==============================
+    // 🟡 Titik Kuning (Livin' Merchant)
+    // ==============================
+    var yellowIcon = new L.Icon({
+      iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-yellow.png',
+      shadowUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
+      iconSize: [25, 41], iconAnchor: [12, 41],
+      popupAnchor: [1, -34], shadowSize: [41, 41]
+    });
+    var yellowLocations = [
+{"lat": -6.2200044, "lon": 106.5305206},
+{"lat": -6.2137146, "lon": 106.5293484},
+{"lat": -6.2153185, "lon": 106.5245437},
+{"lat": -6.2108962, "lon": 106.5266715},
+{"lat": -6.2167744, "lon": 106.5230967},
+{"lat": -6.2212738, "lon": 106.5563725},
+{"lat": -6.2172851, "lon": 106.5183491},
+{"lat": -6.2231903, "lon": 106.5392701},
+{"lat": -6.231849, "lon": 106.5284204},
+{"lat": -6.2194256, "lon": 106.5201084},
+{"lat": -6.2336583, "lon": 106.5174494},
+{"lat": -6.2318525, "lon": 106.5222069},
+{"lat": -6.2207148, "lon": 106.5542516},
+{"lat": -6.2179962, "lon": 106.5313715},
+{"lat": -6.2085167, "lon": 106.5296651},
+{"lat": -6.2382121, "lon": 106.5196814},
+{"lat": -6.2427039, "lon": 106.5388269},
+{"lat": -6.2135572, "lon": 106.543676},
+{"lat": -6.2280505, "lon": 106.5193073},
+{"lat": -6.2397795, "lon": 106.5183336},
+{"lat": -6.244594, "lon": 106.5258071},
+{"lat": -6.2239382, "lon": 106.5456255},
+{"lat": -6.2380061, "lon": 106.5237246},
+{"lat": -6.2103325, "lon": 106.5245271},
+{"lat": -6.2288887, "lon": 106.5283384},
+{"lat": -6.2292532, "lon": 106.5198009},
+{"lat": -6.2191515, "lon": 106.5416461},
+{"lat": -6.2379521, "lon": 106.516864},
+{"lat": -6.2146251, "lon": 106.5255429},
+{"lat": -6.2394285, "lon": 106.5191875},
+{"lat": -6.2473799, "lon": 106.5308656},
+{"lat": -6.2291838, "lon": 106.5169841},
+{"lat": -6.2437066, "lon": 106.5193244},
+{"lat": -6.2447144, "lon": 106.5234317},
+{"lat": -6.2465865, "lon": 106.5182271},
+{"lat": -6.2108639, "lon": 106.5310403},
+{"lat": -6.2331652, "lon": 106.5487434},
+{"lat": -6.2192044, "lon": 106.5314086},
+{"lat": -6.2383711, "lon": 106.5215433},
+{"lat": -6.2350199, "lon": 106.5227294}
+    ];
+    yellowLocations.forEach(function(loc) {
+      L.marker([loc.lat, loc.lon], {icon: yellowIcon})
+        .addTo(map)
+        .bindPopup("<b>Livin' Merchant</b><br>Lat: " + loc.lat + "<br>Lon: " + loc.lon);
+    });
+
+    // ==============================
+    // 📝 Legend (Keterangan)
+    // ==============================
+    var legend = L.control({position: 'bottomright'});
+    legend.onAdd = function () {
+      var div = L.DomUtil.create('div', 'legend');
+      div.innerHTML += "<h4>Keterangan</h4>";
+      div.innerHTML += '<i style="background: url(https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png) no-repeat center; background-size: contain;"></i> KC Tangerang Cikupa<br>';
+      div.innerHTML += '<i style="background: url(https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png) no-repeat center; background-size: contain;"></i> EDC Mandiri<br>';
+      div.innerHTML += '<i style="background: url(https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-yellow.png) no-repeat center; background-size: contain;"></i> Livin\' Merchant<br>';
+      return div;
+    };
+    legend.addTo(map);
+
+    // ==============================
+    // 📍 Tombol Kembali ke Titik Tengah
+    // ==============================
+    function goBack() {
+      map.setView([specialLat, specialLon], 14); // kembali ke titik merah
+      redMarker.openPopup(); // buka popup titik merah
+    }
+  </script>
+</body>
+</html>
